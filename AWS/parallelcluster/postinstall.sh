@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euoo posix pipefail
+set -euo posix
 
 ##############################################################################################
 # # This script will setup Spack and best practices for a few applications.                  #
@@ -427,10 +427,9 @@ setup_pcluster_buildcache_stack() {
         cp "${STACK_DIR}/packages.yaml" "${SPACK_ROOT}"/etc/spack/packages.yaml
     fi
     # Patch packages.yaml
-    [ -n "${SLURM_VERSION}" ] && yq -i ".packages.slurm.externals[0].spec = \"slurm@${SLURM_VERSION} +pmix\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
-    [ -d "${SLURM_ROOT}" ] && yq -i ".packages.slurm.externals[0].prefix = \"${SLURM_ROOT}\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
-    [ -n "${LIBFABRIC_VERSION}" ] && yq -i ".packages.libfabric.externals[0].spec = \"libfabric@${LIBFABRIC_VERSION}\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
-    return 0
+    [ -z "${SLURM_VERSION}" ] || yq -i ".packages.slurm.externals[0].spec = \"slurm@${SLURM_VERSION} +pmix\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
+    [ ! -d "${SLURM_ROOT}" ] || yq -i ".packages.slurm.externals[0].prefix = \"${SLURM_ROOT}\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
+    [ -z "${LIBFABRIC_VERSION}" ] || yq -i ".packages.libfabric.externals[0].spec = \"libfabric@${LIBFABRIC_VERSION}\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
 }
 
 remove_missing_packages() {
