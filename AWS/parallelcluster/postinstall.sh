@@ -484,14 +484,6 @@ patch_compilers_yaml() {
         yq -i "(.compilers[] | select(.compiler.spec == \"oneapi*\") | .compiler.extra_rpaths) = [\"${oneapi_gcc_path}/lib64\"]" "${compilers_yaml}"
     fi
 
-    # TODO: Who needs this? WRF? gromacs will not build when this is active.
-    # Armclang needs to find its own libraries
-    if acfl_path=$(spack find -p acfl 2>/dev/null | awk '/acfl/ {print $2}') && \
-            [ -d "${acfl_path}" ] && cpp_include_path=$(dirname "$(find "${acfl_path}" -name cassert)") && \
-            [ -d "${cpp_include_path}" ]; then
-        yq -i "(.compilers[] | select(.compiler.spec == \"arm*\") | .compiler.environment.prepend_path.CPATH) = \"${cpp_include_path}:${cpp_include_path}/aarch64-linux-gnu\"" "${compilers_yaml}"
-    fi
-
     # Armclang needs extra_rpath to libstdc++.so
     # TODO: FYI ACFL installer does this by adding libstdc++.so.6 path to LD_LIBRARY_PATH
     if acfl_path=$(spack find -p acfl 2>/dev/null | awk '/acfl/ {print $2}') && \
