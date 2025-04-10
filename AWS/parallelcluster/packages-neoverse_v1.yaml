@@ -2,7 +2,7 @@
 packages:
   acfl:
     # the %gcc only matters for pre spack 1.0, and causes problems at 1.0 and onward if it is a strict requirement.
-    variant: "%gcc"
+    variants: "%gcc"
     require:
       - one_of: ["target=aarch64"]
         message: "Clang based compilers need GCC libraries and they should be made available for the wide range of CPUs they actually support.
