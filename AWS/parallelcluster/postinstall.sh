@@ -376,6 +376,9 @@ set_pcluster_defaults() {
     if [ "$(cat /tmp/packages.yaml)" != "404: Not Found" ]; then
         envsubst < /tmp/packages.yaml > "${install_path}/etc/spack/packages.yaml"
     fi
+    # We keep the older format in the repo, but if we cloned spack 1.0 we need to upgrade before it is usable.
+    . "${install_path}/share/spack/setup-env.sh"
+    spack config --scope=site update packages
 }
 
 load_spack_at_login() {
