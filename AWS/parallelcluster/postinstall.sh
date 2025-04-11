@@ -376,8 +376,6 @@ set_pcluster_defaults() {
     if [ "$(cat /tmp/packages.yaml)" != "404: Not Found" ]; then
         envsubst < /tmp/packages.yaml > "${install_path}/etc/spack/packages.yaml"
     fi
-    # We keep the older format in the repo, but if we cloned spack 1.0 we need to upgrade before it is usable.
-    spack config --scope=site update packages
 }
 
 load_spack_at_login() {
@@ -432,9 +430,6 @@ setup_pcluster_buildcache_stack() {
     [ -z "${SLURM_VERSION}" ] || yq -i ".packages.slurm.externals[0].spec = \"slurm@${SLURM_VERSION} +pmix\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
     [ ! -d "${SLURM_ROOT}" ] || yq -i ".packages.slurm.externals[0].prefix = \"${SLURM_ROOT}\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
     [ -z "${LIBFABRIC_VERSION}" ] || yq -i ".packages.libfabric.externals[0].spec = \"libfabric@${LIBFABRIC_VERSION}\"" "${SPACK_ROOT}"/etc/spack/packages.yaml
-
-    # We keep the older format in the repo, but if we cloned spack 1.0 we need to upgrade before it is usable.
-    spack config --scope=site update packages
 }
 
 remove_missing_packages() {
@@ -446,6 +441,9 @@ remove_missing_packages() {
         echo "No libfabric found, removing from packages.yaml"
         yq -i "del(.packages.libfabric)" "${SPACK_ROOT}"/etc/spack/packages.yaml
     fi
+
+    # We keep the older format in the repo, but if we cloned spack 1.0 we need to upgrade before it is usable.
+    spack config --scope=site update packages
 }
 
 setup_spack() {
