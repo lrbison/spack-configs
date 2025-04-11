@@ -443,7 +443,7 @@ remove_missing_packages() {
     fi
 
     # We keep the older format in the repo, but if we cloned spack 1.0 we need to upgrade before it is usable.
-    spack config --scope=site update packages
+    spack config --scope=site update --yes-to-all packages
 }
 
 setup_spack() {
