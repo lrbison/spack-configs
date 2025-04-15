@@ -567,9 +567,10 @@ install_acfl() {
 }
 
 setup_mirrors() {
-    . "${install_path}/share/spack/setup-env.sh"
 
     if ${generic_buildcache}; then
+        . "${install_path}/share/spack/setup-env.sh"
+
         # $SPACK_BRANCH can point to an existing release, e.g. v0.23.0: In this case there exists a versioned buildcache.
         # Or it points to a development branch. In this case we want use the "v0.23.1" build cache.
         if curl -sfLI "https://binaries.spack.io/${SPACK_BRANCH}/aws-pcluster-$(stack_arch)/build_cache/index.json" -o /dev/null; then
@@ -577,17 +578,16 @@ setup_mirrors() {
         else
             spack mirror add --scope site "aws-pcluster-$(stack_arch)" "https://binaries.spack.io/v0.23.1/aws-pcluster-$(stack_arch)"
         fi
-    fi
 
-    # Add older specific target mirrors if they exist
-    mirror_url="https://binaries.spack.io/v0.23.1/aws-pcluster-$(target | sed -e 's?_avx512??1')"
-    if curl -fIsLo /dev/null "${mirror_url}/build_cache/index.json"; then
-        spack mirror list | grep -q $mirror_url || \
-            spack mirror add --scope site "aws-pcluster-legacy" "${mirror_url}"
+        # Add older specific target mirrors if they exist
+        mirror_url="https://binaries.spack.io/v0.23.1/aws-pcluster-$(target | sed -e 's?_avx512??1')"
+        if curl -fIsLo /dev/null "${mirror_url}/build_cache/index.json"; then
+            spack mirror list | grep -q $mirror_url || \
+                spack mirror add --scope site "aws-pcluster-legacy" "${mirror_url}"
+        fi
+        # add keys if we added any binary buildcaches.
+        spack mirror list | grep -qE '\[.*b.*\]' && spack buildcache keys -it
     fi
-
-    # add keys if we added any binary buildcaches.
-    spack mirror list | grep -qE '\[.*b.*\]' && spack buildcache keys -it
     return 0
 }
 
